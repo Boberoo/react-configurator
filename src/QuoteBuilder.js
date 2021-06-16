@@ -103,7 +103,7 @@ class QuoteBuilder extends React.Component {
   
   renderQuoteDetails = (quote) => {
 	  return (<ul>{quote.quote_lines.map((line) =>
-	  <li>{line.quantity}x {line.stock_code} {line.description} <RecipeDetail {...line} credentials={this.props.credentials}/></li>)}</ul>); 
+	  <li>{line.quantity}x {line.stock_code} {line.description} <RecipeDetail {...quote} {...line} credentials={this.props.credentials}/></li>)}</ul>); 
 	  
 	  //NB. the ... makes it pass the object properties individually
   }

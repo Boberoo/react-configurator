@@ -7,10 +7,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        
         <img src={logo} className="App-logo" alt="logo" />
-        <h1>
-          Configurator
-        </h1>
+        <h1>Configurator</h1>
       </header>
 	  <QuoteBuilder reference="Q00008" credentials={credentials}/>
     </div>
