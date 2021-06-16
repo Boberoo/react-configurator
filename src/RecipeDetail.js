@@ -75,7 +75,7 @@ class RecipeDetail extends React.Component {
   getTotalExcl = () => {
 	 let recipeLines = this.state.recipeLines;
      if (!recipeLines) return 0;	 
-	 return recipeLines.reduce((a, b) => a+b.excl_unit_selling_price, 0); 
+	 return recipeLines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
   }
   
   getSnapshotBeforeUpdate(prevProps, prevState) {
@@ -180,7 +180,7 @@ class RecipeDetail extends React.Component {
       subRecipe = <RecipeDetail {...this.props} {...line} />;
     
 	  
-   return (<li>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line)} {subRecipe} </li>);
+   return (<li>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
    
   }
    
@@ -212,7 +212,7 @@ class RecipeDetail extends React.Component {
     return (<div>
 	{this.renderRecipeDetails(recipeLines)}
 		
-	  <p>Total: {this.getTotalExcl()}</p>
+	  <p>Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
 	  </div>);
   }
   

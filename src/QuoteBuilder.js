@@ -124,21 +124,21 @@ class QuoteBuilder extends React.Component {
             <option value="Parts">Parts</option>
           </select>
         </label>
-		<label>Length:
+		<label> Length:
       <input
         type='number'
         name='length'
 		value={quote.length}
         onChange={this.handleQuoteMasterChange}
       /></label>
-      <label>Width:
+      <label> Width:
       <input
         type='number'
         name='width'
 		value={quote.width}
         onChange={this.handleQuoteMasterChange}
       /></label>
-	  <label>Height:
+	  <label> Height:
       <input
         type='number'
         name='height'
@@ -148,19 +148,20 @@ class QuoteBuilder extends React.Component {
 	  <p>Volume: {this.getVolume()+" cubic metres"}</p>
 	  
 	  {this.renderQuoteDetails(quote)}
-	  <p>Total: {this.getTotalExcl()}</p>
+	  <p>Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
 	  </div>);
   }
   
   
   render() {
     const carname = "Ford";
+    console.log(this.props);
     return (
       <form onSubmit={this.submitQuote}>
       <h1>Enter the type and dimensions</h1>
       <p id="status"></p>
 	  {this.renderQuoteMaster()}
-	  
+	  <button type="submit" action="save">Save Quote</button> <button type="submit" action="saveas">Save As New Quote</button>
       </form>
     );
   }
