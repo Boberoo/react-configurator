@@ -52,6 +52,34 @@ class QuoteBuilder extends React.Component {
 	
   }
   
+  saveQuote(quote) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{ "quote" : { '+JSON.stringify(quote)+' }'
+    };
+    fetch("http://st.omniaccounts.co.za:55683/Quote/"+this.props.reference+"?"+this.props.credentials, requestOptions)
+        .then((res) => {
+		  if (!res.ok) { 
+		    return res.text().then(text => {throw text});
+		  } 
+		  else {
+		    return res.text();
+		  }
+		  })
+        .then(data => this.setState({ statusmessage: data }),
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+			
+          this.setState({
+            //isLoaded: true,
+            statusmessage: "Error: "+error
+          });
+        });
+  }
+  
   componentDidMount() {
     setTimeout(() => {
       
@@ -69,10 +97,15 @@ class QuoteBuilder extends React.Component {
 	 return quote.width * quote.length * quote.height;
   }
   
+  getExtPrice = (line) => {
+	  
+	 return line.quantity * line.selling_price;
+  }
+  
   getTotalExcl = () => {
 	 let quote = this.state.quote;
      if (!quote) return 0;	 
-	 return quote.quote_lines.reduce((a, b) => a+b.ext_price, 0); 
+	 return quote.quote_lines.reduce((a, b) => a+this.getExtPrice(b), 0); 
   }
   
   getSnapshotBeforeUpdate(prevProps, prevState) {
@@ -96,14 +129,29 @@ class QuoteBuilder extends React.Component {
 	
   }
   
+  DoPriceChanged = (index, newVal) => {
+    //console.log("ssssssssssssasasas")
+    const { error, isLoaded, quote } = this.state;
+    //console.log(isLoaded);
+    if (isLoaded && quote) {
+      //quote.quote_lines[index].selling_price = newVal;
+      //console.log(quote);
+      //this.setState(() => ({ quote }));
+      this.state.quote.quote_lines[index].selling_price = newVal;
+    }
+  }
+  
    submitQuote = (event) => {
     event.preventDefault();
-    alert("You are submitting " + this.state.reference);
+    //###do some basic validation?
+    //alert("You are submitting " + this.state.reference);
+    this.saveQuote(this.state.quote);
+    //alert(this.state.statusmessage);
   }
   
   renderQuoteDetails = (quote) => {
-	  return (<ul>{quote.quote_lines.map((line) =>
-	  <li>{line.quantity}x {line.stock_code} {line.description} <RecipeDetail {...quote} {...line} credentials={this.props.credentials}/></li>)}</ul>); 
+	  return (<ul>{quote.quote_lines.map((line, index) =>
+	  <li>{line.quantity}x {line.stock_code} {line.description} <RecipeDetail {...quote} {...line} lineindex={index} OnPriceChanged={this.DoPriceChanged} credentials={this.props.credentials}/></li>)}</ul>); 
 	  
 	  //NB. the ... makes it pass the object properties individually
   }
@@ -149,17 +197,19 @@ class QuoteBuilder extends React.Component {
 	  
 	  {this.renderQuoteDetails(quote)}
 	  <p>Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
+    <p id="statusmessage">{this.state.statusmessage}</p>
 	  </div>);
   }
   
   
   render() {
     const carname = "Ford";
-    console.log(this.props);
+    //console.log(this.props);
     return (
       <form onSubmit={this.submitQuote}>
       <h1>Enter the type and dimensions</h1>
-      <p id="status"></p>
+      
+    <p id="status">{this.state.status}</p>
 	  {this.renderQuoteMaster()}
 	  <button type="submit" action="save">Save Quote</button> <button type="submit" action="saveas">Save As New Quote</button>
       </form>

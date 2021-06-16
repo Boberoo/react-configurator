@@ -205,14 +205,20 @@ class RecipeDetail extends React.Component {
   renderRecipe = () => {
 	//let quote = this.state.quote;  
 	const { error, isLoaded, recipeLines } = this.state;
-    if (error) return <h2>Error: {error}</h2>;
-    if (!isLoaded) return <div>Loading...</div>;
+  if (error) return <h2>Error: {error}</h2>;
+  if (!isLoaded) return <div>Loading...</div>;
 	if (!recipeLines) return (<h2>Loading..</h2>);  
+  
+  const total = this.getTotalExcl();
+  
+  if (this.props.OnPriceChanged) {
+    this.props.OnPriceChanged(this.props.lineindex, total);
+  }
 		
-    return (<div>
+   return (<div>
 	{this.renderRecipeDetails(recipeLines)}
 		
-	  <p>Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
+	  <p>Total: {total.toLocaleString(undefined, {maximumFractionDigits:2})}</p>
 	  </div>);
   }
   
