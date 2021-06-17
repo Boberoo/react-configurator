@@ -56,7 +56,7 @@ class QuoteBuilder extends React.Component {
     const requestOptions = {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: '{ "quote" : { '+JSON.stringify(quote)+' }'
+        body: '{ "quote" :  '+JSON.stringify(quote)+'  }'
     };
     fetch("http://st.omniaccounts.co.za:55683/Quote/"+this.props.reference+"?"+this.props.credentials, requestOptions)
         .then((res) => {

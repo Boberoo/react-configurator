@@ -8,7 +8,7 @@ class RecipeDetail extends React.Component {
   constructor(props) {
     super(props);
 	this.state = {
-      recipeLines: null,
+      recipe: null,
       isLoaded: false,
 	  expanded: false
     };
@@ -22,7 +22,8 @@ class RecipeDetail extends React.Component {
   loadRecipe() {
 	  //console.log(this.props.stock_code);
 	  ///#######this report is a stock list, need a report or a proper endpoint, will use as POC for now though
-	fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
+	//fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
+  fetch("http://st.omniaccounts.co.za:55683/Stock Recipe/"+this.props.stock_code+"?"+this.props.credentials)
       .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});
@@ -35,11 +36,11 @@ class RecipeDetail extends React.Component {
       .then(
         (result) => {
 			
-		      console.log(JSON.stringify(result.recipe_export));
+		      console.log(JSON.stringify(result));
 		  
           this.setState({
             isLoaded: true,
-            recipeLines: result.recipe_export
+            recipe: result.stock_recipe
           });
         },
         // Note: it's important to handle errors here
@@ -67,15 +68,15 @@ class RecipeDetail extends React.Component {
   }
   
   getWeight = () => {
-	 let recipeLines = this.state.recipeLines;
-     if (!recipeLines) return 0;	 
-	 return recipeLines.reduce((a, b) => a+b.ext_weight, 0); 
+	 let recipe = this.state.recipe;
+     if (!recipe) return 0;	 
+	 return recipe.recipe_lines.reduce((a, b) => a+b.ext_weight, 0); 
   }
   
   getTotalExcl = () => {
-	 let recipeLines = this.state.recipeLines;
-     if (!recipeLines) return 0;	 
-	 return recipeLines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
+	 let recipe = this.state.recipe;
+     if (!recipe) return 0;	 
+	 return recipe.recipe_lines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
   }
   
   getSnapshotBeforeUpdate(prevProps, prevState) {
@@ -108,7 +109,7 @@ class RecipeDetail extends React.Component {
   }
    
    calcQty = (line) => {
-     let formula = line.recipe_memo;
+     let formula = line.memo;
      
      //####TEST
      formula = "HM*5";
@@ -155,7 +156,8 @@ class RecipeDetail extends React.Component {
        
      } */
      
-     let price = line.excl_unit_selling_price;
+     //let price = line.excl_unit_selling_price;
+     let price = 100; //####need to look up from stock code - unless we make the recipe a report, and add those on as calc fields
      
      if (this.props.build_type === "Trailer")
        price *= 1.3
@@ -176,7 +178,7 @@ class RecipeDetail extends React.Component {
    renderRecipeDetail = (line) => {
 	  
     let subRecipe;
-    if (line.has_sub_recipe)
+    if (line.manufacture_sub_recipe)
       subRecipe = <RecipeDetail {...this.props} {...line} />;
     
 	  
@@ -184,7 +186,7 @@ class RecipeDetail extends React.Component {
    
   }
    
-  renderRecipeDetails = (recipeLines) => {
+  renderRecipeDetails = (recipe) => {
 	  const expanded = this.state.expanded;
 	  const checkbox = <label>
           Expand:
@@ -198,16 +200,20 @@ class RecipeDetail extends React.Component {
 	  if (!expanded)
 	    return checkbox;	  
 	  else
-	    return (<div>{checkbox}<ul>{recipeLines.map((line) =>
+	    return (<div>{checkbox}<ul>{recipe.recipe_lines.map((line) =>
       this.renderRecipeDetail(line))}</ul></div>);
   }
   
   renderRecipe = () => {
 	//let quote = this.state.quote;  
-	const { error, isLoaded, recipeLines } = this.state;
-  if (error) return <h2>Error: {error}</h2>;
+	const { error, isLoaded, recipe } = this.state;
+  if (error) 
+    if (error.includes("does not have a recipe"))
+      return <sup>{error}</sup>;
+    else
+      return <h2>Error: {error}</h2>;
   if (!isLoaded) return <div>Loading...</div>;
-	if (!recipeLines) return (<h2>Loading..</h2>);  
+	if (!recipe) return (<h2>Loading..</h2>);  
   
   const total = this.getTotalExcl();
   
@@ -216,7 +222,7 @@ class RecipeDetail extends React.Component {
   }
 		
    return (<div>
-	{this.renderRecipeDetails(recipeLines)}
+	{this.renderRecipeDetails(recipe)}
 		
 	  <p>Total: {total.toLocaleString(undefined, {maximumFractionDigits:2})}</p>
 	  </div>);
