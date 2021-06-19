@@ -22,7 +22,7 @@ class QuoteBuilder extends OmniReactComponent {
   loadQuote() {
     const url = this.state.baseUrl+"/Quote/"+this.props.reference+"?"+this.state.credentials;
     
-    console.log(url);
+    //console.log(url);
 	  
 	  fetch(url)
       .then((res) => {
@@ -35,7 +35,7 @@ class QuoteBuilder extends OmniReactComponent {
 		  })
       .then(
         (result) => {
-          console.log(result);
+          //console.log(result);
           this.setState({
             isLoaded: true,
             quote: result.quote
@@ -45,7 +45,7 @@ class QuoteBuilder extends OmniReactComponent {
         // instead of a catch() block so that we don't swallow
         // exceptions from actual bugs in components.
         (error) => {
-			    console.log(error);
+			    //console.log(error);
           this.setState({
             isLoaded: true,
             error
@@ -155,7 +155,7 @@ class QuoteBuilder extends OmniReactComponent {
   
   renderQuoteDetails = (quote) => {
 	  return (<ul>{quote.quote_lines.map((line, index) =>
-	  <li>{line.quantity}x {line.stock_code} {line.description} <RecipeDetail {...quote} {...line} lineindex={index} OnPriceChanged={this.DoPriceChanged} credentials={this.props.credentials}/></li>)}</ul>); 
+	  <li key={line.line_no}>{line.quantity}x {line.stock_code} {line.description} <RecipeDetail {...quote} {...line} lineindex={index} OnPriceChanged={this.DoPriceChanged} credentials={this.props.credentials}/></li>)}</ul>); 
 	  
 	  //NB. the ... makes it pass the object properties individually
   }

@@ -3,7 +3,17 @@
 import OmniReactComponent from './Omni.js';
 
 
-
+function ROUNDUP(num, precision) {
+  
+  
+  if (!precision) //make an optional param
+    precision = 0;
+    
+  //console.log(precision);
+  //console.log(10**precision);
+  
+  return Math.round((num+(0.499/10**precision)) * 10**precision) / 10**precision;
+}
 
 class RecipeDetail extends OmniReactComponent {
   constructor(props) {
@@ -113,29 +123,40 @@ class RecipeDetail extends OmniReactComponent {
      let formula = line.memo;
      
      //####TEST
-     formula = "HM*5";
+     //formula = "HM*5";
      
      if (!formula || formula === "")
        return line.quantity_required;
      
+     //####CUSTOM RULES#### - sort of
+     
      formula = formula.replace("LM", this.props.length);
      formula = formula.replace("WM", this.props.width);
      formula = formula.replace("HM", this.props.height);
+     formula = formula.replace("L", this.props.length*1000);
+     formula = formula.replace("W", this.props.width*1000);
+     formula = formula.replace("H", this.props.height*1000);
      
-     console.log(formula);
+     //console.log(ROUNDUP(8500/1220)); //should be 7 add to unit tests?
+     //console.log((8500/1220));
+     //console.log(eval('ROUNDUP(8500/1220),0')); NB eval evaluates this to 0, no error - the comma in this formula should have been inside the brackets
      
      try {
        let qty = eval(formula);
+       console.log(formula+" = "+qty);
        return qty;
      }
      catch(err) {
-       document.getElementById("error").innerHTML = err.message;
+       const message = "Error on formula "+formula+": "+err.message;
+       console.log(message);
+       document.getElementById("status").innerHTML = message
        
      }     
      
    }
    
    calcUnitPrice = (line) => {
+     //####CUSTOM RULES####
      //let formula = "if (this.props.build_type) this.props.discount1"; can let them put price formula somewhere too?
      
      
@@ -178,12 +199,13 @@ class RecipeDetail extends OmniReactComponent {
    
    renderRecipeDetail = (line) => {
 	  
-    let subRecipe;
-    if (line.manufacture_sub_recipe)
-      subRecipe = <RecipeDetail {...this.props} {...line} />;
+    //let subRecipe; just use a report that expands all detail, and includes the necessary stock info too, ie SP3 and discount 1..5
+    //if (line.manufacture_sub_recipe)
+    //  subRecipe = <RecipeDetail {...this.props} {...line} />;
     
 	  
-   return (<li>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
+   //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
+   return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
    
   }
    
