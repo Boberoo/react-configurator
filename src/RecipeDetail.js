@@ -142,7 +142,7 @@ class RecipeDetail extends OmniReactComponent {
      //console.log(eval('ROUNDUP(8500/1220),0')); NB eval evaluates this to 0, no error - the comma in this formula should have been inside the brackets
      
      try {
-       let qty = eval(formula);
+       let qty = ROUNDUP(eval(formula), 3); //always make max 3 decimal places
        console.log(formula+" = "+qty);
        return qty;
      }
@@ -157,15 +157,14 @@ class RecipeDetail extends OmniReactComponent {
    
    calcUnitPrice = (line) => {
      //####CUSTOM RULES####
-     //let formula = "if (this.props.build_type) this.props.discount1"; can let them put price formula somewhere too?
-     
-     
+     //let formula = "if (this.props.build_type) this.props.discount1"; can let them put price formula somewhere too? Maybe have a memo on the Job Category..?
+         
      //if (!formula || formula === "")
      //  return line.quantity_required;
      
      //formula = formula.replace("D1", this.props.length);
      //formula = formula.replace("D2", this.props.width);
-     //formula = formula.replace("SP3", this.props.SellingPrice3);
+     //formula = formula.replace("SP3", line.selling_price_3);
      
      /*console.log(formula);
      
@@ -178,7 +177,7 @@ class RecipeDetail extends OmniReactComponent {
        
      } */
      
-     //let price = line.excl_unit_selling_price;
+     //let price = line.stock_selling_price_3;
      let price = 100; //####need to look up from stock code - unless we make the recipe a report, and add those on as calc fields
      
      if (this.props.build_type === "Trailer")
@@ -205,7 +204,8 @@ class RecipeDetail extends OmniReactComponent {
     
 	  
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
-   return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
+   //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
+   return (<tr key={line.seq_no}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
    
   }
    
@@ -223,8 +223,8 @@ class RecipeDetail extends OmniReactComponent {
 	  if (!expanded)
 	    return checkbox;	  
 	  else
-	    return (<div>{checkbox}<ul>{recipe.recipe_lines.map((line) =>
-      this.renderRecipeDetail(line))}</ul></div>);
+	    return (<span>{checkbox}<table className="table-center recipe-detail"><tbody>{recipe.recipe_lines.map((line) =>
+      this.renderRecipeDetail(line))}</tbody></table></span>);
   }
   
   renderRecipe = () => {
@@ -244,11 +244,11 @@ class RecipeDetail extends OmniReactComponent {
     this.props.OnPriceChanged(this.props.lineindex, total);
   }
 		
-   return (<div>
+   return (<span><b>Total: {total.toLocaleString(undefined, {maximumFractionDigits:2})}</b>&nbsp;
 	{this.renderRecipeDetails(recipe)}
 		
-	  <p>Total: {total.toLocaleString(undefined, {maximumFractionDigits:2})}</p>
-	  </div>);
+	  
+	  </span>);
   }
   
   

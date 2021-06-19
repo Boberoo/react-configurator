@@ -24,7 +24,7 @@ function App() {
       <header className="App-header">
         
         <img src={logo} className="App-logo" alt="logo" />
-        <div>
+        <div className="App-name">
         <h1>Configurator</h1>
         <sup>Quote Builder</sup>
         </div>

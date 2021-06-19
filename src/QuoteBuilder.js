@@ -62,7 +62,7 @@ class QuoteBuilder extends OmniReactComponent {
         headers: { 'Content-Type': 'application/json' },
         body: '{ "quote" :  '+JSON.stringify(quote)+'  }'
     };
-    fetch("http://st.omniaccounts.co.za:55683/Quote/"+this.props.reference+"?"+this.props.credentials, requestOptions)
+    fetch(this.state.baseUrl+"/Quote/"+this.props.reference+"?"+this.state.credentials, requestOptions)
         .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});
@@ -103,7 +103,10 @@ class QuoteBuilder extends OmniReactComponent {
   
   getExtPrice = (line) => {
 	  
-	 return line.quantity * line.selling_price;
+   if (line.selling_price_per) 
+     return line.quantity * line.selling_price / line.selling_price_per
+   else
+	   return line.quantity * line.selling_price;
   }
   
   getTotalExcl = () => {
@@ -167,7 +170,7 @@ class QuoteBuilder extends OmniReactComponent {
     if (!isLoaded) return <div>Loading...</div>;
 	if (!quote) return (<h2>Loading..</h2>);  
 		
-    return (<div><label>
+    return (<div><span className="form-group"><label>
           Select the build type:
           <select name="build_type" value={quote.build_type} onChange={this.handleQuoteMasterChange}>
             <option value="Semi-Rigid">Semi-Rigid</option>
@@ -175,32 +178,32 @@ class QuoteBuilder extends OmniReactComponent {
             <option value="Repair">Repair</option>
             <option value="Parts">Parts</option>
           </select>
-        </label>
-		<label> Length:
+        </label></span>
+		<span className="form-group"><label> Length:
       <input
         type='number'
         name='length'
 		value={quote.length}
         onChange={this.handleQuoteMasterChange}
-      /></label>
-      <label> Width:
+      /></label></span>
+      <span className="form-group"><label> Width:
       <input
         type='number'
         name='width'
 		value={quote.width}
         onChange={this.handleQuoteMasterChange}
-      /></label>
-	  <label> Height:
+      /></label></span>
+	  <span className="form-group"><label> Height:
       <input
         type='number'
         name='height'
 		value={quote.height}
         onChange={this.handleQuoteMasterChange}
-      /></label>
+      /></label></span>
 	  <p>Volume: {this.getVolume()+" cubic metres"}</p>
 	  
 	  {this.renderQuoteDetails(quote)}
-	  <p>Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
+	  <p className="grand-total">Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
     <p id="statusmessage">{this.state.statusmessage}</p>
 	  </div>);
   }
@@ -215,7 +218,7 @@ class QuoteBuilder extends OmniReactComponent {
       
     <p id="status">{this.state.status}</p>
 	  {this.renderQuoteMaster()}
-	  <button type="submit" action="save">Save Quote</button> <button type="submit" action="saveas">Save As New Quote</button>
+	  <button type="submit" action="save">Save Quote</button> <button type="submit" action="saveas">Save As New Quote</button> <button type="submit" action="saveasrev">Save As Revised Quote</button>
       </form>
     );
   }
