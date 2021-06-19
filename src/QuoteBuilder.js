@@ -1,16 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+//import React from 'react';
+//import ReactDOM from 'react-dom';
 import RecipeDetail from './RecipeDetail.js';
+import OmniReactComponent from './Omni.js';
 
 
 
 
-class QuoteBuilder extends React.Component {
+class QuoteBuilder extends OmniReactComponent {
   constructor(props) {
     super(props);
-	this.state = {
-      quote: null,
-      isLoaded: false
+	this.state = {...this.state, 
+      quote: null
     };
 	
   }
@@ -20,8 +20,11 @@ class QuoteBuilder extends React.Component {
   } 
   
   loadQuote() {
+    const url = this.state.baseUrl+"/Quote/"+this.props.reference+"?"+this.state.credentials;
+    
+    console.log(url);
 	  
-	fetch("http://st.omniaccounts.co.za:55683/Quote/"+this.props.reference+"?"+this.props.credentials)
+	  fetch(url)
       .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});
@@ -32,6 +35,7 @@ class QuoteBuilder extends React.Component {
 		  })
       .then(
         (result) => {
+          console.log(result);
           this.setState({
             isLoaded: true,
             quote: result.quote
@@ -41,7 +45,7 @@ class QuoteBuilder extends React.Component {
         // instead of a catch() block so that we don't swallow
         // exceptions from actual bugs in components.
         (error) => {
-			
+			    console.log(error);
           this.setState({
             isLoaded: true,
             error
@@ -203,7 +207,7 @@ class QuoteBuilder extends React.Component {
   
   
   render() {
-    const carname = "Ford";
+    //const carname = "Ford";
     //console.log(this.props);
     return (
       <form onSubmit={this.submitQuote}>

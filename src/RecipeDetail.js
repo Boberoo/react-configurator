@@ -1,18 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+//import React from 'react';
+//import ReactDOM from 'react-dom';
+import OmniReactComponent from './Omni.js';
 
 
 
 
-class RecipeDetail extends React.Component {
+class RecipeDetail extends OmniReactComponent {
   constructor(props) {
     super(props);
-	this.state = {
+    this.state = {...this.state, 
       recipe: null,
-      isLoaded: false,
-	  expanded: false
+	    expanded: false
     };
-	
+    
   }
   
  static getDerivedStateFromProps(props, state) {
@@ -23,7 +23,8 @@ class RecipeDetail extends React.Component {
 	  //console.log(this.props.stock_code);
 	  ///#######this report is a stock list, need a report or a proper endpoint, will use as POC for now though
 	//fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
-  fetch("http://st.omniaccounts.co.za:55683/Stock Recipe/"+this.props.stock_code+"?"+this.props.credentials)
+  //fetch("http://st.omniaccounts.co.za:55683/Stock Recipe/"+this.props.stock_code+"?"+this.props.credentials)
+  fetch(this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?"+this.state.credentials)
       .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});

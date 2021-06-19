@@ -6,6 +6,8 @@ import QuoteBuilder from './QuoteBuilder.js';
 function getDefaultVal(name, defaultval) {
   let val = (new URLSearchParams(window.location.search)).get(name); //NB. is case sensitive!
   if (!val || val === "")
+    val = process.env.name;
+  if (!val || val === "")
     val = defaultval;
   return val;
 }
