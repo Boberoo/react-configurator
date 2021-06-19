@@ -31,11 +31,33 @@ class OmniReactComponent extends React.Component {
     let val = (new URLSearchParams(window.location.search)).get(name); //NB. is case sensitive!
     if (!val || val === "") {
       val = process.env.["REACT_APP_"+name]; //NB. for react, env variables MUST be prefixed with REACT_APP_
-  }
+    }
     if (!val || val === "")
       val = defaultval;
     return val;
   }
+  
+  getUserName = () => {
+    return sessionStorage.UserName;
+  }
+  
+  setUserNameAndLogonToken = (userName, logonToken) => {
+    sessionStorage.UserName = userName;
+    sessionStorage.Token = logonToken;
+    
+    this.setState({
+            userName: userName,
+            password: logonToken
+          });
+  }
+  
+  DoLogonChanged = () => {
+    this.setState({
+            userName: sessionStorage.UserName,
+            password: sessionStorage.Token
+          });
+  }
+  
   
   restGet = (endpoint, id) => {
     //##willneed a callback for what do do witht the success response

@@ -1,6 +1,7 @@
 //import React from 'react';
 //import ReactDOM from 'react-dom';
 import RecipeDetail from './RecipeDetail.js';
+import Login from './Login.js';
 import OmniReactComponent from './Omni.js';
 
 
@@ -157,6 +158,8 @@ class QuoteBuilder extends OmniReactComponent {
     }
   }
   
+  
+  
    submitQuote = (event) => {
     event.preventDefault();
     //###do some basic validation?
@@ -221,6 +224,11 @@ class QuoteBuilder extends OmniReactComponent {
   render() {
     //const carname = "Ford";
     //console.log(this.props);
+    if (!this.getUserName()) {
+      return (
+    <Login onLogon={this.DoLogonChanged}/>);
+    }
+    
     return (
       <form onSubmit={this.submitQuote}>
       <h1>Enter the type and dimensions</h1>
