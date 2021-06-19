@@ -19,6 +19,9 @@ class OmniReactComponent extends React.Component {
       //quote: null,
       baseUrl,
       credentials,
+      userName: this.getDefaultVal("UserName", "Guest"),
+      password: this.getDefaultVal("Password", "Dev2021"),
+      companyName: this.getDefaultVal("CompanyName", "SA Example Company [Demo]"),
       isLoaded: false
     };
 	
@@ -32,6 +35,10 @@ class OmniReactComponent extends React.Component {
     if (!val || val === "")
       val = defaultval;
     return val;
+  }
+  
+  restGet = (endpoint, id) => {
+    //##willneed a callback for what do do witht the success response
   }
 
 

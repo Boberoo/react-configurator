@@ -20,11 +20,20 @@ class QuoteBuilder extends OmniReactComponent {
   } 
   
   loadQuote() {
-    const url = this.state.baseUrl+"/Quote/"+this.props.reference+"?"+this.state.credentials;
+    const url = this.state.baseUrl+"/Quote/"+this.props.reference+"?CompanyName="+this.state.companyName;
     
-    //console.log(url);
+    console.log(url);
+    
+    //let base64 = require('base-64');
+    let headers = new Headers();
+
+   //headers.append('Content-Type', 'text/json');
+    //headers.append('Authorization', 'Basic ' + base64.encode(this.state.userName + ":" + this.state.password));
+    headers.set('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
 	  
-	  fetch(url)
+	  fetch(url, {method:'GET',
+        headers: headers
+       })
       .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});
@@ -45,7 +54,7 @@ class QuoteBuilder extends OmniReactComponent {
         // instead of a catch() block so that we don't swallow
         // exceptions from actual bugs in components.
         (error) => {
-			    //console.log(error);
+			    console.log(error);
           this.setState({
             isLoaded: true,
             error
