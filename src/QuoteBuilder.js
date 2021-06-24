@@ -33,6 +33,7 @@ class QuoteBuilder extends OmniReactComponent {
     headers.set('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
 	  
 	  fetch(url, {method:'GET',
+        mode: 'no-cors',
         headers: headers
        })
       .then((res) => {

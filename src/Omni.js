@@ -10,7 +10,7 @@ class OmniReactComponent extends React.Component {
   constructor(props) {
     super(props);
     //dotenv.config();
-    const baseUrl = this.getDefaultVal("BaseUrl", "http://st.omniaccounts.co.za:55683");
+    const baseUrl = this.getDefaultVal("BaseUrl", "https://st.omniaccounts.co.za:55682");
     //console.log(baseUrl);
     const credentials = "UserName="+this.getDefaultVal("UserName", "Guest")+"&Password="+this.getDefaultVal("Password", "Dev2021")+"&CompanyName="+this.getDefaultVal("CompanyName", "SA Example Company [Demo]");
     //console.log(credentials);
