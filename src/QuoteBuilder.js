@@ -21,7 +21,7 @@ class QuoteBuilder extends OmniReactComponent {
   } 
   
   loadQuote() {
-    const url = this.state.baseUrl+"/Quote/"+this.props.reference+"?CompanyName="+this.state.companyName;
+    const url = this.state.baseUrl+"/Quote/"+this.props.reference+"?CompanyName="+encodeURIComponent(this.state.companyName);
     
     console.log(url);
     
@@ -34,11 +34,13 @@ class QuoteBuilder extends OmniReactComponent {
 	  
 	  fetch(url, {method:'GET',
         mode: 'no-cors',
+        redirect: 'follow',
         headers: headers
        })
       .then((res) => {
 		  if (!res.ok) { 
-		    return res.text().then(text => {throw text});
+        
+		    return res.text().then(text => {console.log(text); throw text;});
 		  } 
 		  else {
 		    return res.json();
