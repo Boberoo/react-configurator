@@ -28,14 +28,25 @@ class QuoteBuilder extends OmniReactComponent {
     //let base64 = require('base-64');
     let headers = new Headers();
 
-   //headers.append('Content-Type', 'text/json');
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
     //headers.append('Authorization', 'Basic ' + base64.encode(this.state.userName + ":" + this.state.password));
-    headers.set('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    //headers.set('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    headers.append('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    const auth = 'Basic ' + Buffer.from(this.state.userName + ':' + this.state.password).toString('base64');
+    
 	  
 	  fetch(url, {method:'GET',
-        mode: 'no-cors',
+        //mode: 'no-cors',
+        mode: 'cors',
         redirect: 'follow',
-        headers: headers
+        credentials: 'include', //without this, authorizaion header won't get passed through to cross origin call
+        //headers: headers
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': auth
+        }
        })
       .then((res) => {
 		  if (!res.ok) { 
@@ -58,7 +69,7 @@ class QuoteBuilder extends OmniReactComponent {
         // instead of a catch() block so that we don't swallow
         // exceptions from actual bugs in components.
         (error) => {
-			    console.log(error);
+			    console.log(JSON.stringify(error));
           this.setState({
             isLoaded: true,
             error
