@@ -15,11 +15,18 @@ function ROUNDUP(num, precision) {
   return Math.round((num+(0.499/10**precision)) * 10**precision) / 10**precision;
 }
 
+function IIF(condition, trueresult, falseresult) {
+  if (condition)
+    return trueresult
+  else
+    return falseresult;
+}
+
 class RecipeDetail extends OmniReactComponent {
   constructor(props) {
     super(props);
     this.state = {...this.state, 
-      recipe: null,
+      recipe_lines: null,
 	    expanded: false
     };
     
@@ -31,10 +38,36 @@ class RecipeDetail extends OmniReactComponent {
   
   loadRecipe() {
 	  //console.log(this.props.stock_code);
+    //const url = this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?CompanyName="+encodeURIComponent(this.state.companyName);
+    const url = this.state.baseUrl+"/Report/Recipe Export - Individual?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
+    
+    console.log(url);
+    
+    let headers = new Headers();
+
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+    //headers.append('Authorization', 'Basic ' + base64.encode(this.state.userName + ":" + this.state.password));
+    //headers.set('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    headers.append('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    const auth = 'Basic ' + Buffer.from(this.state.userName + ':' + this.state.password).toString('base64');
+    
 	  ///#######this report is a stock list, need a report or a proper endpoint, will use as POC for now though
 	//fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
   //fetch("http://st.omniaccounts.co.za:55683/Stock Recipe/"+this.props.stock_code+"?"+this.props.credentials)
-  fetch(this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?"+this.state.credentials)
+  //fetch(this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?"+this.state.credentials)
+  fetch(url, {method:'GET',
+        //mode: 'no-cors',
+        mode: 'cors',
+        redirect: 'follow',
+        credentials: 'include', //without this, authorizaion header won't get passed through to cross origin call
+        //headers: headers
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': auth
+        }
+       })
       .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});
@@ -51,7 +84,8 @@ class RecipeDetail extends OmniReactComponent {
 		  
           this.setState({
             isLoaded: true,
-            recipe: result.stock_recipe
+            //recipe: result.stock_recipe
+            recipe_lines: result.recipe_export___individual
           });
         },
         // Note: it's important to handle errors here
@@ -79,15 +113,15 @@ class RecipeDetail extends OmniReactComponent {
   }
   
   getWeight = () => {
-	 let recipe = this.state.recipe;
-     if (!recipe) return 0;	 
-	 return recipe.recipe_lines.reduce((a, b) => a+b.ext_weight, 0); 
+	 let recipe_lines = this.state.recipe_lines;
+     if (!recipe_lines) return 0;	 
+	 return recipe_lines.reduce((a, b) => a+b.ext_weight, 0); 
   }
   
   getTotalExcl = () => {
-	 let recipe = this.state.recipe;
-     if (!recipe) return 0;	 
-	 return recipe.recipe_lines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
+	 let recipe_lines = this.state.recipe_lines;
+     if (!recipe_lines) return 0;	 
+	 return recipe_lines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
   }
   
   getSnapshotBeforeUpdate(prevProps, prevState) {
@@ -105,8 +139,8 @@ class RecipeDetail extends OmniReactComponent {
   handleRecipeMasterChange = (event) => {
     let nam = event.target.name;
     let val = event.target.value;
-	const recipe = { ...this.state.recipe, [nam]: val }
-    this.setState(() => ({ recipe }))
+	const recipe_lines = { ...this.state.recipe_lines, [nam]: val }
+    this.setState(() => ({ recipe_lines }))
     //this.setState({...this.state.quote, [nam]: val});
 	
   }
@@ -120,13 +154,15 @@ class RecipeDetail extends OmniReactComponent {
   }
    
    calcQty = (line) => {
-     let formula = line.memo;
+     //let formula = line.memo;
+     let formula = line.recipe_memo;
      
      //####TEST
-     //formula = "HM*5";
+     //formula = "ROUNDUP(HM*5,1)";
      
      if (!formula || formula === "")
-       return line.quantity_required;
+       //return line.quantity_required;
+     return line.quantity;
      
      //####CUSTOM RULES#### - sort of
      
@@ -142,7 +178,7 @@ class RecipeDetail extends OmniReactComponent {
      //console.log(eval('ROUNDUP(8500/1220),0')); NB eval evaluates this to 0, no error - the comma in this formula should have been inside the brackets
      
      try {
-       let qty = ROUNDUP(eval(formula), 3); //always make max 3 decimal places
+       let qty = line.quantity * ROUNDUP(eval(formula), 3); //always make max 3 decimal places
        console.log(formula+" = "+qty);
        return qty;
      }
@@ -157,28 +193,9 @@ class RecipeDetail extends OmniReactComponent {
    
    calcUnitPrice = (line) => {
      //####CUSTOM RULES####
-     //let formula = "if (this.props.build_type) this.props.discount1"; can let them put price formula somewhere too? Maybe have a memo on the Job Category..?
-         
-     //if (!formula || formula === "")
-     //  return line.quantity_required;
      
-     //formula = formula.replace("D1", this.props.length);
-     //formula = formula.replace("D2", this.props.width);
-     //formula = formula.replace("SP3", line.selling_price_3);
-     
-     /*console.log(formula);
-     
-     try {
-       let qty = eval(formula);
-       return qty;
-     }
-     catch(err) {
-       document.getElementById("error").innerHTML = err.message;
-       
-     } */
-     
-     //let price = line.stock_selling_price_3;
-     let price = 100; //####need to look up from stock code - unless we make the recipe a report, and add those on as calc fields
+     let price = line.stock_unit_selling_price_3;
+     //let price = 100; //####need to look up from stock code - unless we make the recipe a report, and add those on as calc fields >> done
      
      if (this.props.build_type === "Trailer")
        price *= 1.3
@@ -209,7 +226,7 @@ class RecipeDetail extends OmniReactComponent {
    
   }
    
-  renderRecipeDetails = (recipe) => {
+  renderRecipeDetails = (recipe_lines) => {
 	  const expanded = this.state.expanded;
 	  const checkbox = <label>
           Expand:
@@ -223,20 +240,20 @@ class RecipeDetail extends OmniReactComponent {
 	  if (!expanded)
 	    return checkbox;	  
 	  else
-	    return (<span>{checkbox}<table className="table-center recipe-detail"><tbody>{recipe.recipe_lines.map((line) =>
+	    return (<span>{checkbox}<table className="table-center recipe-detail"><tbody>{recipe_lines.map((line) =>
       this.renderRecipeDetail(line))}</tbody></table></span>);
   }
   
   renderRecipe = () => {
 	//let quote = this.state.quote;  
-	const { error, isLoaded, recipe } = this.state;
+	const { error, isLoaded, recipe_lines } = this.state;
   if (error) 
     if (error.includes("does not have a recipe"))
       return <sup>{error}</sup>;
     else
       return <h2>Error: {error}</h2>;
   if (!isLoaded) return <div>Loading...</div>;
-	if (!recipe) return (<h2>Loading..</h2>);  
+	if (!recipe_lines) return (<h2>Loading..</h2>);  
   
   const total = this.getTotalExcl();
   
@@ -245,7 +262,7 @@ class RecipeDetail extends OmniReactComponent {
   }
 		
    return (<span><b>Total: {total.toLocaleString(undefined, {maximumFractionDigits:2})}</b>&nbsp;
-	{this.renderRecipeDetails(recipe)}
+	{this.renderRecipeDetails(recipe_lines)}
 		
 	  
 	  </span>);
