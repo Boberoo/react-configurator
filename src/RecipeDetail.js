@@ -235,8 +235,10 @@ class RecipeDetail extends OmniReactComponent {
     //let subRecipe; just use a report that expands all detail, and includes the necessary stock info too, ie SP3 and discount 1..5
     //if (line.manufacture_sub_recipe)
     //  subRecipe = <RecipeDetail {...this.props} {...line} />;
+    
     if (line.has_recipe == "Y") return null;
-	  
+	  if (line.has_recipe == "N" && !line.parent_stock_code) return null; //want not a recipe item at all, but one line gets returned
+    
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
    //return (<tr key={line.seq_no}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
@@ -273,18 +275,25 @@ class RecipeDetail extends OmniReactComponent {
     else
       return <h2>Error: {error}</h2>;
   if (!isLoaded) return <div>Loading...</div>;
-	if (!recipe_lines) return (<h2>Loading..</h2>);  
+	if (!recipe_lines) return (<h2>Loading..</h2>); 
+
+  if (recipe_lines.length == 0)
+    return <sup>No recipe</sup>;  
+  
+  if (recipe_lines.length == 1 && recipe_lines.stock_parent_code == null)
+    return <sup>No recipe.</sup>;  
   
   const total = this.getTotalExcl();
   
-  if (this.props.OnPriceChanged) {
+	if (this.props.OnPriceChanged) {
     this.props.OnPriceChanged(this.props.lineindex, total);
-  }
-		
+  } 
+    
    return (<span><b>Total: {total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</b>&nbsp;
 	{this.renderRecipeDetails(recipe_lines)}
 		
-	  
+	
+   
 	  </span>);
   }
   

@@ -122,6 +122,7 @@ class Login extends OmniReactComponent {
         type="text"
         name="userName"
         placeholder="User Name"
+        className="form-control"
         onChange={this.handleChange}
       /></label></div>
       <div>
@@ -131,6 +132,7 @@ class Login extends OmniReactComponent {
           type="password"
           name="password"
           placeholder="Password"
+          className="form-control"
           onChange={this.handleChange}
         /></label></div>
       </div>

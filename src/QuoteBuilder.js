@@ -10,8 +10,9 @@ import OmniReactComponent from './Omni.js';
 class QuoteBuilder extends OmniReactComponent {
   constructor(props) {
     super(props);
-	this.state = {...this.state, 
-      quote: null, action: "save"
+    this.refreshTimeout = null;
+  	this.state = {...this.state, 
+      quote: null, action: "save", total: 0.0
     };
 	
   }
@@ -202,10 +203,14 @@ class QuoteBuilder extends OmniReactComponent {
   DoPriceChanged = (index, newVal) => {
     const { error, isLoaded, quote } = this.state;
     if (isLoaded && quote) {
+      if (this.refreshTimeout)
+         clearTimeout(this.refreshTimeout);
       //quote.quote_lines[index].selling_price = newVal;
       //console.log(quote);
       //this.setState(() => ({ quote }));
       this.state.quote.quote_lines[index].selling_price = newVal;
+      this.refreshTimeout = setTimeout(() =>{ this.setState({ total:  this.getTotalExcl() }); }, 50);
+      
     }
   }
   
