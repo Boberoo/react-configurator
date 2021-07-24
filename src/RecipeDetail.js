@@ -48,7 +48,8 @@ class RecipeDetail extends OmniReactComponent {
   loadRecipe() {
 	  //console.log(this.props.stock_code);
     //const url = this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?CompanyName="+encodeURIComponent(this.state.companyName);
-    const url = this.state.baseUrl+"/Report/Recipe Export - Individual?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
+    //const url = this.state.baseUrl+"/Report/Recipe Export - Individual?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
+    const url = this.state.baseUrl+"/Report/Configurator Recipe Detail?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
     
     console.log(url);
     
@@ -94,7 +95,8 @@ class RecipeDetail extends OmniReactComponent {
           this.setState({
             isLoaded: true,
             //recipe: result.stock_recipe
-            recipe_lines: result.recipe_export___individual
+            //recipe_lines: result.recipe_export___individual
+            recipe_lines: result.configurator_recipe_detail
           });
         },
         // Note: it's important to handle errors here
