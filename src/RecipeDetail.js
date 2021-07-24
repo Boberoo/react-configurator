@@ -5,7 +5,6 @@ import OmniReactComponent from './Omni.js';
 
 function ROUNDUP(num, precision) {
   
-  
   if (!precision) //make an optional param
     precision = 0;
     
@@ -13,6 +12,16 @@ function ROUNDUP(num, precision) {
   //console.log(10**precision);
   
   return Math.round((num+(0.499/10**precision)) * 10**precision) / 10**precision;
+}
+
+//not sure if needed, but Omni Trucks test data contains these, and I see it is a valid Excel function too:
+//To round down to the nearest specified place, use the ROUNDDOWN function. >> useful for when qty is negative
+function ROUNDDOWN(num, precision) {
+  
+  if (!precision) //make an optional param
+    precision = 0;
+  
+  return Math.trunc(num * 10**precision) / 10**precision;
 }
 
 function IIF(condition, trueresult, falseresult) {
@@ -152,26 +161,34 @@ class RecipeDetail extends OmniReactComponent {
 	this.setState({[nam]: val});
 	
   }
+  
+   calcId = (line) => {
+     return line.parent_stock_code +'_'+ line.sequence_number.toString();
+   }
    
    calcQty = (line) => {
      //let formula = line.memo;
      let formula = line.recipe_memo;
      
-     //####TEST
-     //formula = "ROUNDUP(HM*5,1)";
+     if (line.has_recipe == "Y") return 0; //skip main recipe and intermediate recipe, only add up the parts
+     
+     //eg formula = "ROUNDUP(HM*5,1)";
      
      if (!formula || formula === "")
        //return line.quantity_required;
-     return line.quantity;
+       return line.quantity;
+     
+     formula = formula.toUpperCase();
      
      //####CUSTOM RULES#### - sort of
      
-     formula = formula.replace("LM", this.props.length);
-     formula = formula.replace("WM", this.props.width);
-     formula = formula.replace("HM", this.props.height);
-     formula = formula.replace("L", this.props.length*1000);
-     formula = formula.replace("W", this.props.width*1000);
-     formula = formula.replace("H", this.props.height*1000);
+     formula = formula.replace(/LM/g, this.props.length*1.0); //the *1.0 is in case you type in 02 in the input box, javascript calc then gives errors about quartets
+     formula = formula.replace(/WM/g, this.props.width*1.0);
+     formula = formula.replace(/HM/g, this.props.height*1.0);
+     formula = formula.replace(/\bL\b/g, this.props.length*1000);
+     formula = formula.replace(/\bW\b/g, this.props.width*1000); //the /b makes sure it's not the W in ROUNDDOWN() for example
+     formula = formula.replace(/\bH\b/g, this.props.height*1000);
+      
      
      //console.log(ROUNDUP(8500/1220)); //should be 7 add to unit tests?
      //console.log((8500/1220));
@@ -179,7 +196,7 @@ class RecipeDetail extends OmniReactComponent {
      
      try {
        let qty = line.quantity * ROUNDUP(eval(formula), 3); //always make max 3 decimal places
-       console.log(formula+" = "+qty);
+       //console.log(formula+" = "+qty);
        return qty;
      }
      catch(err) {
@@ -194,23 +211,23 @@ class RecipeDetail extends OmniReactComponent {
    calcUnitPrice = (line) => {
      //####CUSTOM RULES####
      
-     let price = line.stock_unit_selling_price_3;
-     //let price = 100; //####need to look up from stock code - unless we make the recipe a report, and add those on as calc fields >> done
+     let price = line.stock_unit_selling_price_3; //this is usually the min selling price / landed cost / break even price in most systems
      
      if (this.props.build_type === "Trailer")
-       price *= 1.3
+       price *= (1+Math.abs(line.stock_discount_2)/100)   //use abs(), as theoretially these should be captured as negative discounts, but they may have captured them as positives
      else if (this.props.build_type === "Semi-Rigid")
-       price *= 1.5;
+       price *= (1+Math.abs(line.stock_discount_1)/100);
      else if (this.props.build_type === "Parts")
-       price *= 5.5;
+       price *= (1+Math.abs(line.stock_discount_5)/100);
      
+     price = ROUNDUP(price, 1); //must be rounded to at least 2, customer want the price prettier though so making nearest 10c - maybe use MROUND to 0.05?
 
      return price;
      
    }
    
    calcExtPrice = (line) => {
-     return this.calcUnitPrice(line) * this.calcQty(line);
+     return Math.round(this.calcUnitPrice(line) * this.calcQty(line), 2);
    }
    
    renderRecipeDetail = (line) => {
@@ -218,11 +235,14 @@ class RecipeDetail extends OmniReactComponent {
     //let subRecipe; just use a report that expands all detail, and includes the necessary stock info too, ie SP3 and discount 1..5
     //if (line.manufacture_sub_recipe)
     //  subRecipe = <RecipeDetail {...this.props} {...line} />;
-    
+    if (line.has_recipe == "Y") return null;
 	  
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
-   return (<tr key={line.seq_no}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
+   //return (<tr key={line.seq_no}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
+   //return (<tr key={line.sequence_number}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
+   //return (<tr key={this.calcId(line)}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td></tr>);
+   return (<tr key={this.calcId(line)}><td align="Right">{this.formatQty(this.calcQty(line))}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.formatPrice(this.calcExtPrice(line))}</td></tr>);
    
   }
    
@@ -261,7 +281,7 @@ class RecipeDetail extends OmniReactComponent {
     this.props.OnPriceChanged(this.props.lineindex, total);
   }
 		
-   return (<span><b>Total: {total.toLocaleString(undefined, {maximumFractionDigits:2})}</b>&nbsp;
+   return (<span><b>Total: {total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</b>&nbsp;
 	{this.renderRecipeDetails(recipe_lines)}
 		
 	  

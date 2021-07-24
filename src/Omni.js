@@ -42,6 +42,14 @@ class OmniReactComponent extends React.Component {
     return sessionStorage.UserName;
   }
   
+   formatQty = (qty) => {
+     return qty.toLocaleString(undefined, {maximumFractionDigits:3});
+   }
+   
+   formatPrice = (price) => {
+     return price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+   }
+  
   setUserNameAndLogonToken = (userName, logonToken) => {
     sessionStorage.UserName = userName;
     sessionStorage.Token = logonToken;

@@ -11,7 +11,7 @@ class QuoteBuilder extends OmniReactComponent {
   constructor(props) {
     super(props);
 	this.state = {...this.state, 
-      quote: null
+      quote: null, action: "save"
     };
 	
   }
@@ -80,13 +80,49 @@ class QuoteBuilder extends OmniReactComponent {
 	
   }
   
-  saveQuote(quote) {
+  saveQuote(quote, action) {
+    
+    let headers = new Headers();
+
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+    //headers.append('Authorization', 'Basic ' + base64.encode(this.state.userName + ":" + this.state.password));
+    //headers.set('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    headers.append('Authorization', 'Basic ' + Buffer.from(this.state.userName + ":" + this.state.password).toString('base64'));
+    const auth = 'Basic ' + Buffer.from(this.state.userName + ':' + this.state.password).toString('base64');
+    
+    let restMethod = 'POST';
+    
+    let url = this.state.baseUrl+"/Quote/";
+    if (action == "saveasrev") {
+      url += this.props.reference+"-1";
+    }
+    else if (action == "saveas") {
+      //new quote, don't specify a reference  
+      //clear quote.source_type..?
+    }
+    else { //(action == "save")
+      url += this.props.reference;
+      restMethod = 'PUT';
+    }
+    
+    url += "?CompanyName="+encodeURIComponent(this.state.companyName);
+    
     const requestOptions = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: restMethod,
+        mode: 'cors',
+        redirect: 'follow',
+        credentials: 'include', //without this, authorizaion header won't get passed through to cross origin call
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': auth
+        },
         body: '{ "quote" :  '+JSON.stringify(quote)+'  }'
     };
-    fetch(this.state.baseUrl+"/Quote/"+this.props.reference+"?"+this.state.credentials, requestOptions)
+    
+    //fetch(this.state.baseUrl+"/Quote/"+this.props.reference+"?"+this.state.credentials, requestOptions)
+    fetch(url, requestOptions)
         .then((res) => {
 		  if (!res.ok) { 
 		    return res.text().then(text => {throw text});
@@ -126,7 +162,6 @@ class QuoteBuilder extends OmniReactComponent {
   }
   
   getExtPrice = (line) => {
-	  
    if (line.selling_price_per) 
      return line.quantity * line.selling_price / line.selling_price_per
    else
@@ -160,10 +195,12 @@ class QuoteBuilder extends OmniReactComponent {
 	
   }
   
+  handleInput = e => {
+    this.setState({[e.target.name]: e.target.value});     
+  }
+  
   DoPriceChanged = (index, newVal) => {
-    //console.log("ssssssssssssasasas")
     const { error, isLoaded, quote } = this.state;
-    //console.log(isLoaded);
     if (isLoaded && quote) {
       //quote.quote_lines[index].selling_price = newVal;
       //console.log(quote);
@@ -178,8 +215,11 @@ class QuoteBuilder extends OmniReactComponent {
     event.preventDefault();
     //###do some basic validation?
     //alert("You are submitting " + this.state.reference);
-    this.saveQuote(this.state.quote);
+    //alert(event.target.action);
+    //alert(this.state.action);
+    this.saveQuote(this.state.quote, this.state.action);
     //alert(this.state.statusmessage);
+    
   }
   
   renderQuoteDetails = (quote) => {
@@ -195,41 +235,46 @@ class QuoteBuilder extends OmniReactComponent {
     if (error) return <h2>Error: {error}</h2>;
     if (!isLoaded) return <div>Loading...</div>;
 	if (!quote) return (<h2>Loading..</h2>);  
-		
+  
+	//NB. uses label inside span to	keep the lebel and input together no matter what the screen width, but uses optimal space all the time
     return (<div><span className="form-group"><label>
           Select the build type:
-          <select name="build_type" value={quote.build_type} onChange={this.handleQuoteMasterChange}>
+          <select name="build_type" className="form-control" value={quote.build_type} onChange={this.handleQuoteMasterChange}>
             <option value="Semi-Rigid">Semi-Rigid</option>
             <option value="Trailer">Trailer</option>
             <option value="Repair">Repair</option>
             <option value="Parts">Parts</option>
           </select>
         </label></span>
+    
 		<span className="form-group"><label> Length:
       <input
         type='number'
         name='length'
-		value={quote.length}
+        className="form-control"
+		    value={quote.length}
         onChange={this.handleQuoteMasterChange}
       /></label></span>
       <span className="form-group"><label> Width:
       <input
         type='number'
         name='width'
-		value={quote.width}
+        className="form-control"
+		    value={quote.width}
         onChange={this.handleQuoteMasterChange}
       /></label></span>
 	  <span className="form-group"><label> Height:
       <input
         type='number'
         name='height'
-		value={quote.height}
+        className="form-control"
+		    value={quote.height}
         onChange={this.handleQuoteMasterChange}
       /></label></span>
-	  <p>Volume: {this.getVolume()+" cubic metres"}</p>
+	  <p>Volume: {this.formatQty(this.getVolume())+" cubic metres"}</p>
 	  
 	  {this.renderQuoteDetails(quote)}
-	  <p className="grand-total">Total: {this.getTotalExcl().toLocaleString(undefined, {maximumFractionDigits:2})}</p>
+	  <p className="grand-total">Total: {this.formatPrice(this.getTotalExcl())}</p>
     <p id="statusmessage">{this.state.statusmessage}</p>
 	  </div>);
   }
@@ -247,9 +292,9 @@ class QuoteBuilder extends OmniReactComponent {
       <form onSubmit={this.submitQuote}>
       <h1>Enter the type and dimensions</h1>
       
-    <p id="status">{this.state.status}</p>
-	  {this.renderQuoteMaster()}
-	  <button type="submit" action="save">Save Quote</button> <button type="submit" action="saveas">Save As New Quote</button> <button type="submit" action="saveasrev">Save As Revised Quote</button>
+     <p id="status">{this.state.status}</p>
+	   {this.renderQuoteMaster()}
+	   <button type="submit" name="action" value="save" onClick={this.handleInput}>Save Quote</button> <button type="submit" name="action" value="saveas" onClick={this.handleInput}>Save As New Quote</button> <button type="submit" name="action" value="saveasrev" onClick={this.handleInput}>Save As Revised Quote</button>
       </form>
     );
   }

@@ -64,6 +64,8 @@ li:nth-child(odd) { background: #DEDEEF; }
 
 label {
   display: inline-block;
+  xdisplay: inline;
+  xpadding-right: .4em;
 }
 
 button {
@@ -73,6 +75,25 @@ button {
 .form-group * {
   padding: 5px 5px 5px 5px;
   margin: 0px 5px 0px 5px;
+}
+
+/*Note: bootstrap not used at the moment, these can come out if that changes*/
+.form-control {
+  xdisplay: block;
+  font-size: 14px;
+  font-family: sans-serif;
+  font-weight: 510;
+  color: #444;
+  line-height: 1.2;
+  padding: .4em .4em .5em .4em;
+  xwidth: 100%;
+  max-width: 100%; /* useful when width is set to anything other than 100% */
+  box-sizing: border-box;
+  margin-left: .5em;
+  border: 1px solid #aaa;
+  box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+  border-radius: .3em;
+  background-color: #fff;
 }
 
 @keyframes App-logo-spin {
