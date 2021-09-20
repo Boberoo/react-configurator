@@ -3,6 +3,17 @@ import './App.css';
 import QuoteBuilder from './QuoteBuilder.js';
 import Login from './Login.js';
 
+/*
+  
+  TO DO
+  
+  - if no refno has been specified in the URL, let the user pick from a list of quotes, or at least type the reference number in
+  - move the GET and PUT/POST routine that the quote does to the base class
+  - change quote lines display from a UL to a table - as long as the expand is going to be okay
+  - display price for lines that doesn't have a recipe
+
+*/
+
 
 function getDefaultVal(name, defaultval) {
   let val = (new URLSearchParams(window.location.search)).get(name); //NB. is case sensitive!
