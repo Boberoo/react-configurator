@@ -95,10 +95,10 @@ class QuoteBuilder extends OmniReactComponent {
     let restMethod = 'POST';
     
     let url = this.state.baseUrl+"/Quote/";
-    if (action == "saveasrev") {
+    if (action === "saveasrev") {
       url += this.props.reference+"-1";
     }
-    else if (action == "saveas") {
+    else if (action === "saveas") {
       //new quote, don't specify a reference  
       //clear quote.source_type..?
     }

@@ -172,7 +172,7 @@ class RecipeDetail extends OmniReactComponent {
      //let formula = line.memo;
      let formula = line.recipe_memo;
      
-     if (line.has_recipe == "Y") return 0; //skip main recipe and intermediate recipe, only add up the parts
+     if (line.has_recipe === "Y") return 0; //skip main recipe and intermediate recipe, only add up the parts
      
      //eg formula = "ROUNDUP(HM*5,1)";
      
@@ -182,7 +182,7 @@ class RecipeDetail extends OmniReactComponent {
      
      formula = formula.toUpperCase();
      
-     //####CUSTOM RULES#### - sort of
+     //####CUSTOM RULES#### - supports Length, Width and Height and Excel type formulae
      
      formula = formula.replace(/LM/g, this.props.length*1.0); //the *1.0 is in case you type in 02 in the input box, javascript calc then gives errors about quartets
      formula = formula.replace(/WM/g, this.props.width*1.0);
@@ -211,7 +211,7 @@ class RecipeDetail extends OmniReactComponent {
    }
    
    calcUnitPrice = (line) => {
-     //####CUSTOM RULES####
+     //####CUSTOM RULES#### maybe build type can contain the discount level number to use, and be changed to get the lookup list from Omni, eg. Trailer - 1, Repairs - 3, etc
      
      let price = line.stock_unit_selling_price_3; //this is usually the min selling price / landed cost / break even price in most systems
      
@@ -238,8 +238,8 @@ class RecipeDetail extends OmniReactComponent {
     //if (line.manufacture_sub_recipe)
     //  subRecipe = <RecipeDetail {...this.props} {...line} />;
     
-    if (line.has_recipe == "Y") return null;
-	  if (line.has_recipe == "N" && !line.parent_stock_code) return null; //want not a recipe item at all, but one line gets returned
+    if (line.has_recipe === "Y") return null;
+	  if (line.has_recipe === "N" && !line.parent_stock_code) return null; //want no recipe item at all, but one line gets returned
     
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
@@ -279,10 +279,10 @@ class RecipeDetail extends OmniReactComponent {
   if (!isLoaded) return <div>Loading...</div>;
 	if (!recipe_lines) return (<h2>Loading..</h2>); 
 
-  if (recipe_lines.length == 0)
+  if (recipe_lines.length === 0)
     return <sup>No recipe</sup>;  
   
-  if (recipe_lines.length == 1 && recipe_lines.stock_parent_code == null)
+  if (recipe_lines.length === 1 && recipe_lines.stock_parent_code == null)
     return <sup>No recipe.</sup>;  
   
   const total = this.getTotalExcl();
