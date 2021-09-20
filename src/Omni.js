@@ -3,10 +3,7 @@ import ReactDOM from 'react-dom';
 //import dotenv from 'dotenv';
 
 class OmniReactComponent extends React.Component {
-  
-  
-  
-  
+   
   constructor(props) {
     super(props);
     //dotenv.config();
@@ -69,7 +66,7 @@ class OmniReactComponent extends React.Component {
   
   
   restGet = (endpoint, id) => {
-    //##willneed a callback for what do do witht the success response
+    //##will need a callback for what do do with the success response
   }
 
 

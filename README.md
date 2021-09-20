@@ -1,5 +1,11 @@
 # Getting Started with Create React App
 
+This project has 2 purposes. I needed an excercise to do when learning React. I also wanted to see if an existing Windows application would be suitable ported as a React app.
+
+The main aim of the app is to read a quote from the accounting system, perform some specialised custom calculations to work out the suggested selling price, and then save the updated quote back to the accoutning system.
+
+The prices work off various markups linked to "Build Type". The cost to markup is worked out by calculating the recipe cost. The recipe cost however is further complicated in that the quantities required rely on formulas that take the finshed product's dimensions into account.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
