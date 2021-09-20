@@ -44,20 +44,12 @@ class RecipeDetail extends OmniReactComponent {
   } 
   
   loadRecipe() {
-    //console.log(this.props.stock_code);
-    //const url = this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?CompanyName="+encodeURIComponent(this.state.companyName);
-    //const url = this.state.baseUrl+"/Report/Recipe Export - Individual?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
-    const url = this.state.baseUrl+"/Report/Configurator Recipe Detail?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
     
-    //console.log(url);
+    const url = this.state.baseUrl+"/Report/Configurator Recipe Detail?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
         
     const auth = 'Basic ' + Buffer.from(this.state.userName + ':' + this.state.password).toString('base64');
-    
-  //#######this report is a stock list, need a report or a proper endpoint, will use as POC for now though
-  //fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
-  //fetch("http://st.omniaccounts.co.za:55683/Stock Recipe/"+this.props.stock_code+"?"+this.props.credentials)
-  //fetch(this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?"+this.state.credentials)
-  fetch(url, 
+     
+    fetch(url, 
         { method: 'GET',
           mode: 'cors',
           redirect: 'follow',
@@ -83,8 +75,6 @@ class RecipeDetail extends OmniReactComponent {
       
           this.setState({
             isLoaded: true,
-            //recipe: result.stock_recipe
-            //recipe_lines: result.recipe_export___individual
             recipe_lines: result.configurator_recipe_detail
           });
         },
@@ -152,7 +142,7 @@ class RecipeDetail extends OmniReactComponent {
   }
    
   calcQty = (line) => {
-     //let formula = line.memo;
+     
      let formula = line.recipe_memo;
      
      if (line.has_recipe === "Y") return 0; //skip main recipe and intermediate recipe, only add up the parts
@@ -160,7 +150,6 @@ class RecipeDetail extends OmniReactComponent {
      //eg formula = "ROUNDUP(HM*5,1)";
      
      if (!formula || formula === "")
-       //return line.quantity_required;
        return line.quantity;
      
      formula = formula.toUpperCase();
@@ -190,30 +179,30 @@ class RecipeDetail extends OmniReactComponent {
        console.log(message); //NB. leave in, not a regular temp debug message
        document.getElementById("status").innerHTML = message       
      }         
-   }
+  }
    
-   calcUnitPrice = (line) => {
-     //####CUSTOM RULES#### maybe build type can contain the discount level number to use, and be changed to get the lookup list from Omni, eg. Trailer - 1, Repairs - 3, etc
+  calcUnitPrice = (line) => {
+    //####CUSTOM RULES#### maybe build type can contain the discount level number to use, and be changed to get the lookup list from Omni, eg. Trailer - 1, Repairs - 3, etc
      
-     let price = line.stock_unit_selling_price_3; //this is usually the min selling price / landed cost / break even price in most systems
+    let price = line.stock_unit_selling_price_3; //this is usually the min selling price / landed cost / break even price in most systems
      
-     if (this.props.build_type === "Trailer")
-       price *= (1+Math.abs(line.stock_discount_2)/100)   //use abs(), as theoretially these should be captured as negative discounts, but they may have captured them as positives
-     else if (this.props.build_type === "Semi-Rigid")
-       price *= (1+Math.abs(line.stock_discount_1)/100);
-     else if (this.props.build_type === "Parts")
-       price *= (1+Math.abs(line.stock_discount_5)/100);
+    if (this.props.build_type === "Trailer")
+      price *= (1+Math.abs(line.stock_discount_2)/100)   //use abs(), as theoretially these should be captured as negative discounts, but they may have captured them as positives
+    else if (this.props.build_type === "Semi-Rigid")
+      price *= (1+Math.abs(line.stock_discount_1)/100);
+    else if (this.props.build_type === "Parts")
+      price *= (1+Math.abs(line.stock_discount_5)/100);
      
-     price = ROUNDUP(price, 1); //must be rounded to at least 2 dec place. Customer wants the price prettier though so making nearest 10c - could maybe also use MROUND to 0.05?
+    price = ROUNDUP(price, 1); //must be rounded to at least 2 dec place. Customer wants the price prettier though so making nearest 10c - could maybe also use MROUND to 0.05?
 
-     return price;     
-   }
+    return price;     
+  }
    
-   calcExtPrice = (line) => {
-     return Math.round(this.calcUnitPrice(line) * this.calcQty(line), 2);
-   }
+  calcExtPrice = (line) => {
+    return Math.round(this.calcUnitPrice(line) * this.calcQty(line), 2);
+  }
    
-   renderRecipeDetail = (line) => {	  
+  renderRecipeDetail = (line) => {	  
     //let subRecipe; just use a report that expands all detail, and includes the necessary stock info too, ie SP3 and discount 1..5
     //if (line.manufacture_sub_recipe)
     //  subRecipe = <RecipeDetail {...this.props} {...line} />;
@@ -221,12 +210,7 @@ class RecipeDetail extends OmniReactComponent {
     if (line.has_recipe === "Y") return null;
     if (line.has_recipe === "N" && !line.parent_stock_code) return null; //ideally want no recipe items at all, but one line does get returned, so need to check for this here
     
-   //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
-   //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
-   //return (<tr key={line.seq_no}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
-   //return (<tr key={line.sequence_number}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})}</td></tr>);
-   //return (<tr key={this.calcId(line)}><td align="Right">{this.calcQty(line)}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.calcExtPrice(line).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td></tr>);
-   return (<tr key={this.calcId(line)}><td align="Right">{this.formatQty(this.calcQty(line))}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.formatPrice(this.calcExtPrice(line))}</td></tr>);   
+    return (<tr key={this.calcId(line)}><td align="Right">{this.formatQty(this.calcQty(line))}</td><td align="Left">{line.stock_code}</td><td>{line.stock_description}</td><td>{line.recipe_memo}</td><td align="Right">{this.formatPrice(this.calcExtPrice(line))}</td></tr>);   
   }
    
   renderRecipeDetails = (recipe_lines) => {
