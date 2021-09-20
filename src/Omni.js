@@ -57,7 +57,7 @@ class OmniReactComponent extends React.Component {
           });
   }
   
-  DoLogonChanged = () => {
+  doLogonChanged = () => {
     this.setState({
             userName: sessionStorage.UserName,
             password: sessionStorage.Token

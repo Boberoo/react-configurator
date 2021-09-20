@@ -23,8 +23,8 @@ class QuoteBuilder extends OmniReactComponent {
     //console.log(url);
     
     const auth = 'Basic ' + Buffer.from(this.state.userName + ':' + this.state.password).toString('base64');
-	  
-	  fetch(url, 
+    
+    fetch(url, 
           { method: 'GET',
             mode: 'cors',
             redirect: 'follow',
@@ -247,7 +247,7 @@ class QuoteBuilder extends OmniReactComponent {
   
   render() {
     if (!this.getUserName()) {
-      return (<Login onLogon={this.DoLogonChanged}/>);
+      return (<Login onLogon={this.doLogonChanged}/>);
     }
     
     return (
