@@ -13,7 +13,7 @@ class OmniReactComponent extends React.Component {
     const credentials = "UserName="+this.getDefaultVal("UserName", "Guest")+"&Password="+this.getDefaultVal("Password", "Dev2021")+"&CompanyName="+this.getDefaultVal("CompanyName", "SA Example Company [Demo]");
     //console.log(credentials);
     
-	this.state = {
+  this.state = {
       //quote: null,
       baseUrl,
       credentials,
@@ -22,7 +22,7 @@ class OmniReactComponent extends React.Component {
       companyName: this.getDefaultVal("CompanyName", "SA Example Company [Demo]"),
       isLoaded: false
     };
-	
+
   }
   
   getDefaultVal = (name, defaultval) => {
@@ -39,13 +39,13 @@ class OmniReactComponent extends React.Component {
     return sessionStorage.UserName;
   }
   
-   formatQty = (qty) => {
-     return qty.toLocaleString(undefined, {maximumFractionDigits:3});
-   }
+  formatQty = (qty) => {
+    return qty.toLocaleString(undefined, {maximumFractionDigits:3});
+  }
    
-   formatPrice = (price) => {
-     return price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-   }
+  formatPrice = (price) => {
+    return price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
   
   setUserNameAndLogonToken = (userName, logonToken) => {
     sessionStorage.UserName = userName;
@@ -68,8 +68,6 @@ class OmniReactComponent extends React.Component {
   restGet = (endpoint, id) => {
     //##will need a callback for what do do with the success response
   }
-
-
 }
 
 export default OmniReactComponent;

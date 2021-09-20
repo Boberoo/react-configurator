@@ -35,7 +35,7 @@ class RecipeDetail extends OmniReactComponent {
     super(props);
     this.state = {...this.state, 
       recipe_lines: null,
-	    expanded: false
+      expanded: false
     };    
   }
   
@@ -44,7 +44,7 @@ class RecipeDetail extends OmniReactComponent {
   } 
   
   loadRecipe() {
-	  //console.log(this.props.stock_code);
+    //console.log(this.props.stock_code);
     //const url = this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?CompanyName="+encodeURIComponent(this.state.companyName);
     //const url = this.state.baseUrl+"/Report/Recipe Export - Individual?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
     const url = this.state.baseUrl+"/Report/Configurator Recipe Detail?IFGCode="+encodeURIComponent(this.props.stock_code)+"&CompanyName="+encodeURIComponent(this.state.companyName);
@@ -53,8 +53,8 @@ class RecipeDetail extends OmniReactComponent {
         
     const auth = 'Basic ' + Buffer.from(this.state.userName + ':' + this.state.password).toString('base64');
     
-	  ///#######this report is a stock list, need a report or a proper endpoint, will use as POC for now though
-	//fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
+  //#######this report is a stock list, need a report or a proper endpoint, will use as POC for now though
+  //fetch("http://st.omniaccounts.co.za:55683/Report/Recipe Export?Stock Code="+this.props.stock_code+"&"+this.props.credentials)
   //fetch("http://st.omniaccounts.co.za:55683/Stock Recipe/"+this.props.stock_code+"?"+this.props.credentials)
   //fetch(this.state.baseUrl+"/Stock Recipe/"+this.props.stock_code+"?"+this.state.credentials)
   fetch(url, 
@@ -69,18 +69,18 @@ class RecipeDetail extends OmniReactComponent {
           }
         })
       .then((res) => {
-		    if (!res.ok) { 
-		      return res.text().then(text => {throw text});
-		  } 
-		  else {
-		    //res.text().then(text => {console.log(text)});
-		    return res.json();
-		  }
-		  })
+        if (!res.ok) { 
+          return res.text().then(text => {throw text});
+      } 
+      else {
+        //res.text().then(text => {console.log(text)});
+        return res.json();
+      }
+      })
       .then(
         (result) => {
-		      //console.log(JSON.stringify(result));
-		  
+          //console.log(JSON.stringify(result));
+      
           this.setState({
             isLoaded: true,
             //recipe: result.stock_recipe
@@ -92,7 +92,7 @@ class RecipeDetail extends OmniReactComponent {
         // instead of a catch() block so that we don't swallow
         // exceptions from actual bugs in components.
         (error) => {
-			
+      
           this.setState({
             isLoaded: true,
             error
@@ -103,7 +103,7 @@ class RecipeDetail extends OmniReactComponent {
   
   componentDidMount() {
     setTimeout(() => {      
-	    this.loadRecipe()
+      this.loadRecipe()
     }, 100)
   }
   
@@ -112,21 +112,21 @@ class RecipeDetail extends OmniReactComponent {
   }
   
   getWeight = () => {
-	 let recipe_lines = this.state.recipe_lines;
+   let recipe_lines = this.state.recipe_lines;
      if (!recipe_lines) return 0;	 
-	 return recipe_lines.reduce((a, b) => a+b.ext_weight, 0); 
+   return recipe_lines.reduce((a, b) => a+b.ext_weight, 0); 
   }
   
   getTotalExcl = () => {
-	 let recipe_lines = this.state.recipe_lines;
+   let recipe_lines = this.state.recipe_lines;
      if (!recipe_lines) return 0;	 
-	 return recipe_lines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
+   return recipe_lines.reduce((a, b) => a+this.calcExtPrice(b), 0); 
   }
   
   getSnapshotBeforeUpdate(prevProps, prevState) {
     document.getElementById("status").innerHTML = "Updating..";
     //"Before the update, the favorite was " + prevState.favoritecolor; example of what can be done here	
-	  return null; //??need to return anything?
+    return null; //??need to return anything?
   }
   
   componentDidUpdate() {
@@ -137,14 +137,14 @@ class RecipeDetail extends OmniReactComponent {
   handleRecipeMasterChange = (event) => {
     let nam = event.target.name;
     let val = event.target.value;
-	  const recipe_lines = { ...this.state.recipe_lines, [nam]: val };
+    const recipe_lines = { ...this.state.recipe_lines, [nam]: val };
     this.setState(() => ({ recipe_lines }));
   } 
   
   handleInputChange = (event) => {
     let nam = event.target.name;
     const val = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-	  this.setState({[nam]: val});
+    this.setState({[nam]: val});
   }
   
   calcId = (line) => {
@@ -219,7 +219,7 @@ class RecipeDetail extends OmniReactComponent {
     //  subRecipe = <RecipeDetail {...this.props} {...line} />;
     
     if (line.has_recipe === "Y") return null;
-	  if (line.has_recipe === "N" && !line.parent_stock_code) return null; //ideally want no recipe items at all, but one line does get returned, so need to check for this here
+    if (line.has_recipe === "N" && !line.parent_stock_code) return null; //ideally want no recipe items at all, but one line does get returned, so need to check for this here
     
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} {subRecipe} </li>);
    //return (<li key={line.seq_no}>{this.calcQty(line)}x {line.stock_code} {line.stock_description} {this.calcExtPrice(line).toLocaleString(undefined, {maximumFractionDigits:2})} </li>);
@@ -230,8 +230,8 @@ class RecipeDetail extends OmniReactComponent {
   }
    
   renderRecipeDetails = (recipe_lines) => {
-	  const expanded = this.state.expanded;
-	  const checkbox = <label>
+    const expanded = this.state.expanded;
+    const checkbox = <label>
           Expand:
           <input
             name="expanded"
@@ -240,13 +240,13 @@ class RecipeDetail extends OmniReactComponent {
             onChange={this.handleInputChange} />
         </label>;
         
-	  if (!expanded)
-	    return checkbox;	  
-	  else
-	    return (<span>{checkbox}<table className="table-center recipe-detail"><tbody>{recipe_lines.map((line) => this.renderRecipeDetail(line))}</tbody></table></span>);
+    if (!expanded)
+      return checkbox;
+    else
+      return (<span>{checkbox}<table className="table-center recipe-detail"><tbody>{recipe_lines.map((line) => this.renderRecipeDetail(line))}</tbody></table></span>);
   }
   
-  renderRecipe = () => {	
+  renderRecipe = () => {
     const { error, isLoaded, recipe_lines } = this.state;
     
     if (error) 
@@ -256,7 +256,7 @@ class RecipeDetail extends OmniReactComponent {
         return <h2>Error: {error}</h2>;
       
     if (!isLoaded) return <div>Loading...</div>;
-	  if (!recipe_lines) return (<h2>Loading..</h2>); 
+    if (!recipe_lines) return (<h2>Loading..</h2>); 
 
     if (recipe_lines.length === 0)
       return <sup>No recipe</sup>;  
@@ -266,7 +266,7 @@ class RecipeDetail extends OmniReactComponent {
   
     const total = this.getTotalExcl();
   
-	  if (this.props.OnPriceChanged) {
+    if (this.props.OnPriceChanged) {
       this.props.OnPriceChanged(this.props.lineindex, total);
     } 
     
@@ -276,9 +276,9 @@ class RecipeDetail extends OmniReactComponent {
   
   render() {   
     return (
-	    <div>
-	      <p id="status"></p>      
-	     {this.renderRecipe()}
+      <div>
+        <p id="status"></p>      
+       {this.renderRecipe()}
       </div>
     );
   }

@@ -4,7 +4,7 @@ class Login extends OmniReactComponent {
   
   constructor(props) {
     super(props);
-	  this.state = {...this.state, 
+    this.state = {...this.state, 
                   credentials: null };
   }
   
@@ -20,13 +20,13 @@ class Login extends OmniReactComponent {
     };
     fetch(this.state.baseUrl+"/Logon/"+this.props.userName+"?"+this.state.credentials, requestOptions)
       .then((res) => {
-	      if (!res.ok) { 
+        if (!res.ok) { 
           return res.text().then(text => {throw text});
       } 
-		  else {
-		    return res.text();
-		  }
-		  })
+      else {
+        return res.text();
+      }
+      })
       .then(data => this.setState({ statusmessage: data }),
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -50,7 +50,7 @@ class Login extends OmniReactComponent {
   getSnapshotBeforeUpdate(prevProps, prevState) {
     document.getElementById("status").innerHTML = "Updating..";
     //"Before the update, the favorite was " + prevState.favoritecolor;	
-	  return null; //??
+    return null; //??
   }
   componentDidUpdate() {
     document.getElementById("status").innerHTML = "";  
@@ -59,7 +59,7 @@ class Login extends OmniReactComponent {
   handleChange = (event) => {
     let nam = event.target.name;
     let val = event.target.value;
-	  const credentials = { ...this.state.credentials, [nam]: val }
+    const credentials = { ...this.state.credentials, [nam]: val }
     this.setState(() => ({ credentials }))
   }
   
@@ -99,7 +99,7 @@ class Login extends OmniReactComponent {
           /></label></div>
         </div>
         <p id="status">{this.state.status}</p>
-	      <button type="submit" action="login">Login</button>
+        <button type="submit" action="login">Login</button>
       </form>
     );    
   }
