@@ -19,7 +19,7 @@ class OmniReactComponent extends React.Component {
       credentials,
       userName: this.getDefaultVal("UserName", "Guest"),
       password: this.getDefaultVal("Password", "Dev2021"),
-      companyName: this.getDefaultVal("CompanyName", "SA Example Company [Demo]"),
+      companyName: this.getDefaultVal("CompanyName", "Omni Trucks"),
       isLoaded: false
     };
 
