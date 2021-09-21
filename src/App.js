@@ -7,8 +7,9 @@ import Login from './Login.js';
   
   TO DO
   
-  - if no refno has been specified in the URL, let the user pick from a list of quotes, or at least type the reference number in
+  - finish off the login routine, needs to pass  user credentials through to API
   - move the GET and PUT/POST routine that the quote does to the base class
+  - if no refno has been specified in the URL, let the user pick from a list of quotes, or at least type the reference number in
   - change quote lines display from a UL to a table - as long as the expand is going to be okay
   - display price for lines that doesn't have a recipe
 
