@@ -22,7 +22,7 @@
   align-items: left;
   justify-content: left;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #FEFEFE;
 }
 
 .grand-total {
@@ -60,12 +60,16 @@ li * {
 }
 
 li { background: #EFEFFF; }
-li:nth-child(odd) { background: #DEDEEF; }
+li:nth-child(odd) { background: #DEDEFF; }
 
 label {
   display: inline-block;
   xdisplay: inline;
   xpadding-right: .4em;
+}
+
+h2 {
+  color: #282c34;
 }
 
 button {

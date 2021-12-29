@@ -199,9 +199,9 @@ class QuoteBuilder extends OmniReactComponent {
   
   renderQuoteMaster = () => {
     const { error, isLoaded, quote } = this.state;
-    if (error) return <h2>Error: {error}</h2>;
+    if (error) return <h3>Error: {error}</h3>;
     if (!isLoaded) return <div>Loading...</div>;
-    if (!quote) return (<h2>Loading..</h2>);  
+    if (!quote) return (<h3>Loading..</h3>);  
   
     //NB. uses label inside span to	keep the label and input together no matter what the screen width, but uses optimal space all the time
     return (<div>
@@ -252,7 +252,7 @@ class QuoteBuilder extends OmniReactComponent {
     
     return (
       <form onSubmit={this.submitQuote}>
-        <h1>Enter the type and dimensions</h1>      
+        <h2>Enter the type and dimensions</h2>      
         <p id="status">{this.state.status}</p>
         {this.renderQuoteMaster()}
         <button type="submit" name="action" value="save" onClick={this.handleInput}>Save Quote</button> <button type="submit" name="action" value="saveas" onClick={this.handleInput}>Save As New Quote</button> <button type="submit" name="action" value="saveasrev" onClick={this.handleInput}>Save As Revised Quote</button>
